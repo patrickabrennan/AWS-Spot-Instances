@@ -16,6 +16,12 @@ min_size         = 0
 max_size         = 6
 desired_capacity = 3
 
+# Pick which of the 15 profiles to use
+profile_id = "p2"   # e.g., x86 small — see list below
+
+# Architecture must match the profile (x86 or arm)
+arch = "x86"        # for p1–p10 use "x86", for p11–p15 use "arm"
+
 # Spot overrides
 instance_type_overrides_override = [
   "m6i.large",
@@ -26,6 +32,15 @@ instance_type_overrides_override = [
   "r7i.large"
 ]
 
+# Optional overrides (leave empty to use profile defaults)
+instance_type_overrides_override = []
+ebs_volume_type_override    = null
+ebs_volume_size_gb_override = null
+ebs_iops_override           = null
+ebs_throughput_override     = null
+
+# Spot behavior
+on_demand_percentage = 0  # 0 = pure Spot, >0 adds small On-Demand buffer
 # Optional
 key_name = null
 
