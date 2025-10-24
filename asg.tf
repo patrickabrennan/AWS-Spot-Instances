@@ -1,24 +1,9 @@
-# Build a lookup for cheap demo instance types by arch
-locals {
-  cheap_overrides_map = {
-    arm = toset([
-      "t4g.micro", "t4g.small", "t4g.medium",
-      "m7g.medium", "m7g.large",
-      "m6g.medium", "m6g.large"
-    ])
-    x86 = toset([
-      "t3a.micro", "t3a.small", "t3a.medium",
-      "t3.micro",  "t3.small",  "t3.medium",
-      # a few fallbacks if t-family is tight
-      "m5.large", "c5.large", "r5.large"
-    ])
-  }
-
-  cheap_overrides = local.cheap_overrides_map[var.arch]
-}
+############################
+# asg.tf — uses selected profile
+############################
 
 resource "aws_autoscaling_group" "asg" {
-  # using name_prefix avoids AlreadyExists errors during replacement
+  # Use prefix to avoid AlreadyExists on replacement
   name_prefix               = "${var.asg_name}-"
   min_size                  = var.min_size
   max_size                  = var.max_size
@@ -35,8 +20,9 @@ resource "aws_autoscaling_group" "asg" {
         version            = "$Latest"
       }
 
+      # Build overrides from selected profile (or user override list)
       dynamic "override" {
-        for_each = local.cheap_overrides
+        for_each = toset(local.effective_instance_types)
         content {
           instance_type = override.value
         }
@@ -44,7 +30,6 @@ resource "aws_autoscaling_group" "asg" {
     }
 
     instances_distribution {
-      # pick healthiest Spot pools
       spot_allocation_strategy                 = "capacity-optimized"
       on_demand_percentage_above_base_capacity = var.on_demand_percentage
     }
@@ -58,5 +43,11 @@ resource "aws_autoscaling_group" "asg" {
 
   lifecycle {
     create_before_destroy = true
+
+    # Guard against arch/profile mismatch (e.g., arm profile with x86 AMI)
+    precondition {
+      condition     = contains(["x86","arm"], var.arch) && var.arch == local.selected_profile.arch
+      error_message = "Profile arch (${local.selected_profile.arch}) must match var.arch (${var.arch})."
+    }
   }
 }
