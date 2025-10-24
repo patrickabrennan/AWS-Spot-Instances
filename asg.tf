@@ -18,13 +18,15 @@ locals {
 }
 
 resource "aws_autoscaling_group" "asg" {
-  name                      = var.asg_name
+  # using name_prefix avoids AlreadyExists errors during replacement
+  name_prefix               = "${var.asg_name}-"
   min_size                  = var.min_size
   max_size                  = var.max_size
   desired_capacity          = var.desired_capacity
   vpc_zone_identifier       = [for s in aws_subnet.public : s.id]
   health_check_type         = "EC2"
   capacity_rebalance        = true
+  force_delete              = true
 
   mixed_instances_policy {
     launch_template {
@@ -42,9 +44,9 @@ resource "aws_autoscaling_group" "asg" {
     }
 
     instances_distribution {
+      # pick healthiest Spot pools
       spot_allocation_strategy                 = "capacity-optimized"
       on_demand_percentage_above_base_capacity = var.on_demand_percentage
-      # on_demand_base_capacity = 0
     }
   }
 
