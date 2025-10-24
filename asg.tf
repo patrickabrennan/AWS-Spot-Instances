@@ -1,17 +1,20 @@
+# Build a lookup for cheap demo instance types by arch
 locals {
-  # Cheap Spot instance types for demo
-  cheap_overrides = var.arch == "arm"
-    ? toset([
-        "t4g.micro", "t4g.small", "t4g.medium",
-        "m7g.medium", "m7g.large",
-        "m6g.medium", "m6g.large"
-      ])
-    : toset([
-        "t3a.micro", "t3a.small", "t3a.medium",
-        "t3.micro",  "t3.small",  "t3.medium",
-        # a few fallbacks if t-family is temporarily full
-        "m5.large", "c5.large", "r5.large"
-      ])
+  cheap_overrides_map = {
+    arm = toset([
+      "t4g.micro", "t4g.small", "t4g.medium",
+      "m7g.medium", "m7g.large",
+      "m6g.medium", "m6g.large"
+    ])
+    x86 = toset([
+      "t3a.micro", "t3a.small", "t3a.medium",
+      "t3.micro",  "t3.small",  "t3.medium",
+      # a few fallbacks if t-family is tight
+      "m5.large", "c5.large", "r5.large"
+    ])
+  }
+
+  cheap_overrides = local.cheap_overrides_map[var.arch]
 }
 
 resource "aws_autoscaling_group" "asg" {
@@ -41,6 +44,7 @@ resource "aws_autoscaling_group" "asg" {
     instances_distribution {
       spot_allocation_strategy                 = "capacity-optimized"
       on_demand_percentage_above_base_capacity = var.on_demand_percentage
+      # on_demand_base_capacity = 0
     }
   }
 
