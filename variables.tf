@@ -83,3 +83,12 @@ variable "key_name" {
   default     = null
 }
 
+variable "arch" {
+  description = "Target CPU architecture for cheap demo instances: x86 or arm"
+  type        = string
+  default     = "x86"
+  validation {
+    condition     = contains(["x86","arm"], var.arch)
+    error_message = "arch must be 'x86' or 'arm'."
+  }
+}
