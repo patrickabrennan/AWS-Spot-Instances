@@ -1,10 +1,28 @@
-variable "region"            { type = string  default = "us-east-1" }
+variable "region" { 
+  type = string  
+  default = "us-east-1" 
+}
 
 # ── VPC & subnets (derived, not hard-coded)
-variable "vpc_cidr"          { type = string  default = "10.42.0.0/16" }
-variable "num_subnets"       { type = number  default = 3 }
-variable "azs"               { type = list(string) default = [] } # [] = auto-pick
-variable "subnet_newbits"    { type = number  default = 8 }       # /24 from /16
+variable "vpc_cidr" { 
+  type = string  
+  default = "10.42.0.0/16" 
+}
+
+variable "num_subnets" {
+  type = number  
+  default = 3 
+}
+
+variable "azs" {
+  type = list(string) 
+  default = [] 
+} # [] = auto-pick
+
+variable "subnet_newbits" {
+  type = number  
+  default = 8 
+}       # /24 from /16
 
 # ── Security
 variable "allowed_ingress_ports" {
@@ -12,14 +30,37 @@ variable "allowed_ingress_ports" {
   type        = list(number)
   default     = [22, 3389]
 }
-variable "ingress_cidrs" { type = list(string) default = ["0.0.0.0/0"] }
+
+variable "ingress_cidrs" {
+  type = list(string) 
+  default = ["0.0.0.0/0"] 
+}
 
 # ── ASG / LT
-variable "asg_name"         { type = string default = "app-spot-asg" }
-variable "desired_capacity" { type = number default = 3 }
-variable "min_size"         { type = number default = 0 }
-variable "max_size"         { type = number default = 6 }
-variable "key_name"         { type = string default = null }
+variable "asg_name" {
+  type = string 
+  default = "app-spot-asg" 
+}
+
+variable "desired_capacity" {
+  type = number 
+  default = 3 
+}
+
+variable "min_size" {
+  type = number 
+  default = 0 
+}
+
+variable "max_size" {
+  type = number 
+  default = 6 
+}
+
+variable "key_name" {
+  type = string 
+  default = null
+}
 
 # Architecture for AMI / types
 variable "arch" {
@@ -52,7 +93,22 @@ variable "instance_type_overrides_override" {
   default     = []
 }
 
-variable "ebs_volume_type_override"    { type = string default = null }
-variable "ebs_volume_size_gb_override" { type = number default = null }
-variable "ebs_iops_override"           { type = number default = null }
-variable "ebs_throughput_override"     { type = number default = null }
+variable "ebs_volume_type_override" {
+  type = string 
+  default = null 
+}
+
+variable "ebs_volume_size_gb_override" {
+  type = number 
+  default = null 
+}
+
+variable "ebs_iops_override" {
+  type = number 
+  default = null 
+}
+
+variable "ebs_throughput_override" {
+  type = number 
+  default = null 
+}
