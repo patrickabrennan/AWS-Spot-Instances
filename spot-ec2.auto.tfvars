@@ -7,8 +7,6 @@ num_subnets    = 3
 azs            = []                # or ["us-east-1a","us-east-1b","us-east-1c"]
 subnet_newbits = 8                 # /24s from a /16
 
-key_name = "sap"
-
 # SG ingress
 allowed_ingress_ports = [22, 3389]
 ingress_cidrs         = ["0.0.0.0/0"]  # tighten in real envs
@@ -34,4 +32,4 @@ ebs_throughput_override     = null
 # Spot behavior
 on_demand_percentage = 0  # 0 = pure Spot, >0 adds small On-Demand buffer
 # Optional
-key_name = null
+key_name = "sap"
