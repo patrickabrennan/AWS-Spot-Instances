@@ -92,3 +92,9 @@ variable "arch" {
     error_message = "arch must be 'x86' or 'arm'."
   }
 }
+
+variable "on_demand_percentage" {
+  description = "Percent of capacity above base to run On-Demand (0 = 100% Spot)"
+  type        = number
+  default     = 0
+}
