@@ -122,10 +122,12 @@ locals {
   # Select profile; default to p1 if unknown id
   selected_profile = lookup(local.profiles, var.profile_id, local.profiles.p1)
 
-  # Effective instance list: user override wins, else profile
-  effective_instance_types = length(var.instance_type_overrides_override) > 0
-    ? var.instance_type_overrides_override
-    : local.selected_profile.instance_types
+  # Effective instance list: prefer user override if non-empty, else profile list
+  # coalescelist() returns the first non-empty list.
+  effective_instance_types = coalescelist(
+    var.instance_type_overrides_override,
+    local.selected_profile.instance_types
+  )
 
   # Effective EBS root: each field can be overridden
   effective_ebs = {
