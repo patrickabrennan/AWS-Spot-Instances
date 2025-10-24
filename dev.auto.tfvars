@@ -17,7 +17,7 @@ max_size         = 6
 desired_capacity = 3
 
 # Spot overrides
-instance_type_overrides = [
+instance_type_overrides_override = [
   "m6i.large",
   "c6i.large",
   "r6i.large",
