@@ -1,5 +1,17 @@
 locals {
-  overrides = [for t in var.instance_type_overrides : { instance_type = t }]
+  # Cheap Spot instance types for demo
+  cheap_overrides = var.arch == "arm"
+    ? toset([
+        "t4g.micro", "t4g.small", "t4g.medium",
+        "m7g.medium", "m7g.large",
+        "m6g.medium", "m6g.large"
+      ])
+    : toset([
+        "t3a.micro", "t3a.small", "t3a.medium",
+        "t3.micro",  "t3.small",  "t3.medium",
+        # a few fallbacks if t-family is temporarily full
+        "m5.large", "c5.large", "r5.large"
+      ])
 }
 
 resource "aws_autoscaling_group" "asg" {
@@ -19,17 +31,16 @@ resource "aws_autoscaling_group" "asg" {
       }
 
       dynamic "override" {
-        for_each = local.overrides
+        for_each = local.cheap_overrides
         content {
-          instance_type = override.value.instance_type
-          # weighted_capacity = "1" # optional if mixing sizes
+          instance_type = override.value
         }
       }
     }
 
     instances_distribution {
-      on_demand_percentage_above_base_capacity = 0
-      spot_allocation_strategy                 = "capacity-optimized-prioritized"
+      spot_allocation_strategy                 = "capacity-optimized"
+      on_demand_percentage_above_base_capacity = var.on_demand_percentage
     }
   }
 
@@ -43,4 +54,3 @@ resource "aws_autoscaling_group" "asg" {
     create_before_destroy = true
   }
 }
-
